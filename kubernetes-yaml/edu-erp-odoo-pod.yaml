@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client-pod-name
+  labels:
+    app: client-pod-name
+spec:
+  containers:
+    - name: client-pod-name
+      image: client-odoo-image-name
+      securityContext:
+        runAsUser: 0
+      ports:
+        - containerPort: 8069
+      env:
+      - name: HOST
+        valueFrom:
+          secretKeyRef:
+            name: client-secret-name
+            key: DB_HOST
+      - name: USER
+        valueFrom:
+          secretKeyRef:
+            name: client-secret-name
+            key: DB_USER
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: client-secret-name
+            key: DB_PASSWORD
+      - name: PORT
+        valueFrom:
+          secretKeyRef:
+            name: client-secret-name
+            key: DB_PORT
+      volumeMounts:
+      - mountPath: /etc/odoo
+        name: odoo-pv
+        subPath: config
+      - mountPath: /opt
+        name: odoo-pv
+        subPath: addons
+      - mountPath: /var/lib/odoo/filestore/client-db-name
+        name: odoo-pv
+        subPath: filestore
+  volumes:
+  - name: odoo-pv
+    persistentVolumeClaim:
+      claimName: clinet-pvc-name
